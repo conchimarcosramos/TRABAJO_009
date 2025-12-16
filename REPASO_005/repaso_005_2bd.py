@@ -18,11 +18,13 @@ import sqlite3
 import pandas as pd
 
 # Crear una conexión a la base de datos SQLite que ya existe o crear una nueva
-conexion = sqlite3.connect('alumnos_2.db')
-cursor = conexion.cursor()
+conexion1 = sqlite3.connect('alumnos_2.db')
+conexion2 = sqlite3.connect('cursos_2.db')
+cursor1 = conexion1.cursor()
+cursor2 = conexion2.cursor()
 
 # Crear tabla 'cursos_2' que estará relacionada con la tabla 'alumnos_2' a través de 'curso_id'
-cursor.execute('''
+cursor2.execute('''
 CREATE TABLE cursos_2 (
     id_curso INTEGER PRIMARY KEY,
     nombre_curso TEXT NOT NULL,
@@ -34,13 +36,13 @@ cursos_2_data = [
     (1, 'Python', 40),
     (2, 'JavaScript', 35)
 ]
-cursor.executemany('INSERT INTO cursos_2 (id_curso, nombre_curso, horas) VALUES (?, ?, ?)', 
+cursor2.executemany('INSERT INTO cursos_2 (id_curso, nombre_curso, horas) VALUES (?, ?, ?)', 
                    cursos_2_data)    
 #cursor.executemany realiza múltiples inserciones en una sola llamada
 
 # Creamos la tabla de alumnos_2 relacionada con cursos_2, 
 # con id_curso como clave foránea
-cursor.execute('''
+cursor1.execute('''
 CREATE TABLE alumnos_2 (
     id_alumno INTEGER PRIMARY KEY,
     nombre TEXT NOT NULL,
@@ -57,10 +59,11 @@ alumnos_2_data = [
     (3, 'Elena', 19, 2, 7.8),
     (4, 'Diego', 23, 2, 7.5)
 ]
-cursor.executemany('INSERT INTO alumnos_2 (id_alumno, nombre, edad, id_curso, nota) VALUES (?, ?, ?, ?, ?)', 
-                   alumnos_2_data)
-#cursor.executemany realiza múltiples inserciones en una sola llamada   
-#no es necesario insertar los nombres de los campos si se insertan todos los valores
-# Guardar los cambios y cerrar la conexión
+cursor1.executemany('INSERT INTO alumnos_2 (id_alumno, nombre, edad, id_curso, nota) VALUES (?, ?, ?, ?, ?)', alumnos_2_data)
 
+# Guardar los cambios y cerrar la conexión
+conexion1.commit()
+conexion2.commit()
 print("Tablas creadas e insertados los datos correctamente.")
+conexion1.close()
+conexion2.close()
