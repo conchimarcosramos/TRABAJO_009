@@ -42,4 +42,4 @@ for columna in columnas:
     
         
 conexion.close()
-print
+print ("Conexión cerrada.")
