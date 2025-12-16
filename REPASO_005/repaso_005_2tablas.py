@@ -59,7 +59,45 @@ alumnos_data = [
 ]
 cursor1.executemany('INSERT OR IGNORE INTO alumnos (id_alumno, nombre, edad, id_curso, nota) VALUES (?, ?, ?, ?, ?)', alumnos_data)
 
+
+
+
 # Guardar los cambios y cerrar la conexión
-conexion1.commit()
 print("Base de datos y tablas creadas e insertadas correctamente.")
+
+# Realizar un INNER JOIN entre las tablas 'alumnos' y 'cursos' de la
+# base de datos 'alumnos_cursos.db'
+consulta_join = '''
+SELECT 
+    a.nombre, 
+    a.edad, 
+    b.nombre_curso, 
+    a.nota, 
+    b.horas
+FROM alumnos a
+INNER JOIN cursos b ON a.id_curso = b.id_curso
+ORDER BY b.nombre_curso, a.nota DESC
+'''
+# Ejecutar la consulta y cargar los resultados en un DataFrame de pandas
+df_join = pd.read_sql_query(consulta_join, conexion1)
+print("\nResultados del INNER JOIN entre 'alumnos' y 'cursos':")
+print(df_join)
+
+# Calcular nota media por curso
+print("\nNota media por curso:")
+nota_por_curso = df_join.groupby('nombre_curso')['nota'].mean()
+print(nota_por_curso)
+
+# Calcular número de alumnos por curso
+print("\nNúmero de alumnos por curso:")
+alumnos_por_curso = df_join.groupby('nombre_curso').size()
+print(alumnos_por_curso)
+
+# Cerrar la conexión a la base de datos
+# conexion.commit() guarda los cambios realizados en la base de datos
+# en caso de no hacerlo los cambios no se guardan
+
+print("Conexión a la base de datos cerrada.")
+conexion1.commit()
 conexion1.close()
+
