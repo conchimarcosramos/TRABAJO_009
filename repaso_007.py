@@ -47,6 +47,7 @@ print(df_ventas.dtypes)
 
 #Guardar datos limpios en SQLite
 conn = sqlite3.connect('ventas.db')
+#sqlite3.connect crea una conexión a la base de datos SQLite
 df_ventas.to_sql('ventas', conn, if_exists='replace', index=False)
 print("\nDatos guardados en la base de datos SQLite 'ventas.db' en la tabla 'ventas'.\n")
 
@@ -63,5 +64,35 @@ ORDER BY ventas_totales DESC;
 """
 
 df_por_zona = pd.read_sql_query(consulta_zona, conn)
+#read_sql_query ejecuta la consulta SQL y devuelve un DataFrame de pandas
 print("Resumen de ventas por zona:")
 print(df_por_zona)
+
+# Consulta de ventas por vendedor
+consulta_vendedor ="""
+SELECT 
+    vendedor, 
+    COUNT(*) as num_ventas,
+    ROUND (SUM(importe), 2) as ventas_totales,
+    ROUND (AVG(importe), 2) as venta_promedio   
+FROM ventas
+GROUP BY vendedor
+ORDER BY ventas_totales DESC;
+"""
+df_por_vendedor = pd.read_sql_query(consulta_vendedor, conn)
+#read_sql_query ejecuta la consulta SQL y devuelve un DataFrame de pandas
+print("\nResumen de ventas por vendedor:")
+print(df_por_vendedor)
+
+# Exportar informes a CSV
+df_por_zona.to_csv('informe_ventas_por_zona.csv', index=False)
+#index=False evita que se exporte la columna de índices
+df_por_vendedor.to_csv('informe_ventas_por_vendedor.csv', index=False)
+#index=False evita que se exporte la columna de índices
+print("\nInformes exportados:")
+print("Informe_ventas_por_zona.csv")
+print("Informe_ventas_por_vendedor.csv")
+# Cerrar la conexión a la base de datos
+conn.close()
+print("\nConexión a la base de datos cerrada.")
+print("\nProceso completado.")
