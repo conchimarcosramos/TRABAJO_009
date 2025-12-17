@@ -45,5 +45,23 @@ df_ventas['importe'] = pd.to_numeric(df_ventas['importe'], errors='coerce').asty
 print("\nTipos de datos después de la conversión:")
 print(df_ventas.dtypes)
 
+#Guardar datos limpios en SQLite
+conn = sqlite3.connect('ventas.db')
+df_ventas.to_sql('ventas', conn, if_exists='replace', index=False)
+print("\nDatos guardados en la base de datos SQLite 'ventas.db' en la tabla 'ventas'.\n")
 
+# Consultar datos con SQL
+consulta_zona ="""
+SELECT 
+    zona, 
+    COUNT(*) as num_ventas,
+    ROUND (SUM(importe), 2) as ventas_totales,
+    ROUND (AVG(importe), 2) as venta_promedio   
+FROM ventas
+GROUP BY zona
+ORDER BY ventas_totales DESC;
+"""
 
+df_por_zona = pd.read_sql_query(consulta_zona, conn)
+print("Resumen de ventas por zona:")
+print(df_por_zona)
